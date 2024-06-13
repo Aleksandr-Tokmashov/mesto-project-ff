@@ -11,3 +11,6 @@
 @import url('../blocks/popup/_is-animated/popup_is-animated.css');
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
 
+.profile__image {
+  background-image: url('../images/avatar.jpg');
+}

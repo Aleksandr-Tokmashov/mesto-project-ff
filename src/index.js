@@ -1,49 +1,47 @@
 import './pages/index.css';
-import {initialCards} from './scripts/cards.js'
+import {initialCards} from './components/cards.js'
+import { createCard, renderCard, deleteCard, likeCard } from './components/card.js'
+import { renderCardModal, openModal, closeModal, handleFormSubmit, newCardFormSubmit } from './components/modal.js'
+
 // @todo: Темплейт карточки
 
 const cardTemplate = document.querySelector('#card-template').content;
 
 // @todo: DOM узлы
 
-const placesList = document.querySelector('.places__list');
-
-// @todo: Функция создания карточки
-
-function createCard(cardName, cardLink, deleteFunc) {
-  const card = cardTemplate.querySelector('.places__item').cloneNode(true);
-
-  const cardImage = card.querySelector('.card__image');
-  cardImage.src = cardLink;
-  cardImage.alt = cardName;
-
-  const cardTitle = card.querySelector('.card__title');
-  cardTitle.textContent = cardName;
-
-  const deleteButton = card.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', deleteFunc);
-
-  return card
-}
+const modalTypeEdit = document.querySelector('.popup_type_edit')  // попап с формой редактирования профиля
+const modalTypeNew = document.querySelector('.popup_type_new-card')  // попап с формой добавления карточки
 
 
-function renderCard(cardName, cardLink) {
-  const card = createCard(cardName, cardLink, deleteCard);
-  placesList.append(card);
-}
-
-
-// @todo: Функция удаления карточки
-
-function deleteCard(evt) {
-  const eventTarget = evt.target;
-  const targetParent = eventTarget.closest('.places__item')
-  targetParent.remove()
-}
+const profileEditButton = document.querySelector('.profile__edit-button') // кнопка редактирования профиля
+const profileAddButton = document.querySelector('.profile__add-button') // кнопка добавления карточки
 
 // @todo: Вывести карточки на страницу
 
 initialCards.forEach(function(item) {
-  renderCard(item.name, item.link, deleteCard);
+  renderCard(item.name, item.link, renderCardModal);
 })
 
+
+
+profileEditButton.addEventListener('click', () => { openModal(modalTypeEdit, 'edit') })
+
+profileAddButton.addEventListener('click', () => { openModal(modalTypeNew) })
+
+
+// форма для редактирования профиля
+const formElement = modalTypeEdit.querySelector('.popup__form')
+
+formElement.addEventListener('submit', (evt) =>
+  {handleFormSubmit(evt, modalTypeEdit)}
+);
+
+// форма добавления карточки
+const newCardForm = modalTypeNew.querySelector('.popup__form')
+
+// функция для добавления карточки на страницу
+
+newCardForm.addEventListener('submit', (evt) => {
+  
+  newCardFormSubmit(evt, renderCard, renderCardModal)
+});
