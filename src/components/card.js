@@ -1,40 +1,29 @@
 
 // @todo: Функция создания карточки
 
-function createCard(cardName, cardLink, deleteFunc, likeFunc,  renderModalFunc) {
+function createCard(cardData, callbacks) {
+
   const cardTemplate = document.querySelector('#card-template').content;
   const card = cardTemplate.querySelector('.places__item').cloneNode(true);
 
   const cardImage = card.querySelector('.card__image');
-  cardImage.src = cardLink;
-  cardImage.alt = cardName;
+  cardImage.src = cardData.cardLink;
+  cardImage.alt = cardData.cardName;
 
   const cardTitle = card.querySelector('.card__title');
-  cardTitle.textContent = cardName;
+  cardTitle.textContent = cardData.cardName;
 
   const deleteButton = card.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', deleteFunc);
+  deleteButton.addEventListener('click', callbacks.deleteFunc);
 
   
   const like = card.querySelector('.card__like-button')
-  like.addEventListener('click', likeFunc)
+  like.addEventListener('click', callbacks.likeFunc)
 
-  cardImage.addEventListener('click', () => {renderModalFunc(cardLink, cardName)})
+  cardImage.addEventListener('click', () => {callbacks.renderModalFunc(cardData.cardLink, cardData.cardName)})
 
   return card
 }
-
-// функция вывода карточки на страницу
-
-function renderCard(cardName, cardLink, renderCardModalFunc, start=true) {
-  const placesList = document.querySelector('.places__list');
-  const card = createCard(cardName, cardLink, deleteCard, likeCard, renderCardModalFunc);
-  if (start) {
-    placesList.append(card);
-  } else {placesList.prepend(card);}
-  
-}
-
 
 // @todo: Функция удаления карточки
 
@@ -47,8 +36,8 @@ function deleteCard(evt) {
 // лайк карточки
 
 function likeCard(evt) {
-  evt.target.classList.add('card__like-button_is-active')
+  evt.target.classList.toggle('card__like-button_is-active')
 }
 
 
-export { createCard, renderCard, deleteCard, likeCard };
+export { createCard, deleteCard, likeCard };
