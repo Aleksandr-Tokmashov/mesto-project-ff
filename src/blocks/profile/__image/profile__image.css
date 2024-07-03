@@ -7,8 +7,34 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
-  
+  position: relative
+}
 
+.profile__image:hover {
+  cursor: pointer;
+}
+
+.profile__image:hover::before {
+  content: '';
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  opacity: 80%;
+}
+
+
+.profile__image:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("../../../images/edit-icon.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin: 47px;
 }
 
 @media screen and (max-width: 740px) {

@@ -2,6 +2,7 @@
 // @todo: Функция создания карточки
 
 function createCard(cardData, callbacks) {
+  
 
   const cardTemplate = document.querySelector('#card-template').content;
   const card = cardTemplate.querySelector('.places__item').cloneNode(true);
@@ -12,13 +13,45 @@ function createCard(cardData, callbacks) {
 
   const cardTitle = card.querySelector('.card__title');
   cardTitle.textContent = cardData.cardName;
-
+  
   const deleteButton = card.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', callbacks.deleteFunc);
+
+  if (cardData.profileInfo._id === cardData.cardInfo.owner._id ) {
+    deleteButton.addEventListener('click', (evt) =>
+      {callbacks.deleteFunc(evt);
+       callbacks.deleteOnServerFunc(cardData.cardId)}
+      );}
+  else {
+    deleteButton.remove()
+  }
+  
+ 
+
+  const numberOfLikes = card.querySelector('.number-of-likes')
+  numberOfLikes.textContent = cardData.likes.length
+
+  const like = card.querySelector('.card__like-button')
+
+  if (cardData.likes.some(like => {return like._id === cardData.profileInfo._id})) {
+    like.classList.add('card__like-button_is-active')
+  }
+
+  like.addEventListener('click', evt => {
+    callbacks.likeFunc(evt);
+    if (evt.target.classList.contains('card__like-button_is-active')) {
+      callbacks.likeCardOnServerFunc(cardData.cardId)
+      .then(res => {
+        numberOfLikes.textContent = res.likes.length
+      })}
+    else {
+      callbacks.removeLikeFromCardOnServerFunc(cardData.cardId)
+      .then(res => {
+        numberOfLikes.textContent = res.likes.length
+      })
+    }
+})
 
   
-  const like = card.querySelector('.card__like-button')
-  like.addEventListener('click', callbacks.likeFunc)
 
   cardImage.addEventListener('click', () => {callbacks.renderModalFunc(cardData.cardLink, cardData.cardName)})
 
