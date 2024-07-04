@@ -41,6 +41,16 @@ const modalImage = modalTypeImage.querySelector('.popup__image')
 const modalCaption = modalTypeImage.querySelector('.popup__caption')
 
 const profileImage = document.querySelector('.profile__image')
+
+const formValidation = 
+  {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  }
 // функция вывода карточки на страницу
 
 function renderCard(cardData, callbacks, start=true) {
@@ -79,56 +89,53 @@ function editProfileFormSubmit(evt, modal) {
   const nameInputValue = modalInputName.value
   const jobInputValue = modalInputDescription.value
   editProfileOnServer({name: nameInputValue, about: jobInputValue})
+    .then((res) => {
+      profileTitle.textContent = res.name
+      profileDescription.textContent = res.about
+    })
+    .catch((err) => {
+      console.log(err); 
+    })
     .finally(() => {
       renderLoading(editProfileForm, false)
     })
-  profileTitle.textContent = nameInputValue
-  profileDescription.textContent = jobInputValue
+  
 
   closeModal(evt.target.closest('.popup'))
 }
 
 function newCardFormSubmit(evt, renderCardFunc, renderCardModalFunc) {
-  const newCard = addCardOnServer({name: nameInput.value, link: linkInput.value})
+
   evt.preventDefault();
   renderLoading(newCardForm, true)
-  Promise.all([getProfileInfoFromServer, newCard])
-  .then((results) => {
-    const profileInfo = results[0];
-    const res = results[1];
-    renderCardFunc({
-      'cardInfo': res,
-      'profileInfo': profileInfo,
-      'cardName': res.name, 
-      'cardLink': res.link,
-      'cardId': res._id,
-      'likes': res.likes},
-      {'renderCardModalFunc' : renderCardModalFunc}, 
-      false);
-    })
-    .finally(() => {
-      renderLoading(newCardForm, false)
-    })
+  addCardOnServer({name: nameInput.value, link: linkInput.value})
+    .then(res => {
+      renderCardFunc({
+        'cardInfo': res,
+        'profileInfo': res.owner,
+        'cardName': res.name, 
+        'cardLink': res.link,
+        'cardId': res._id,
+        'likes': res.likes},
+        {'renderCardModalFunc' : renderCardModalFunc}, 
+        false);
+      })
+      .catch((err) => {
+        console.log(err); 
+      })
+      .finally(() => {
+        renderLoading(newCardForm, false)
+      })
 
   closeModal(evt.target.closest('.popup'));
   
-  nameInput.value = '';
-  linkInput.value = '';
+  newCardForm.reset();
 }
 
 
 
 profileEditButton.addEventListener('click', () => {
-  clearValidation(editProfileForm,
-    {
-      formSelector: '.popup__form',
-      inputSelector: '.popup__input',
-      submitButtonSelector: '.popup__button',
-      inactiveButtonClass: 'popup__button_disabled',
-      inputErrorClass: 'popup__input_type_error',
-      errorClass: 'popup__error_visible'
-    }
-  )
+  clearValidation(editProfileForm, formValidation)
   openModal(modalTypeEdit);
   fillFields();
 })
@@ -144,14 +151,7 @@ const editProfileForm = modalTypeEdit.querySelector('.popup__form');
 
 
 
-enableValidation({
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-}); 
+enableValidation(formValidation); 
 
 
 
@@ -165,16 +165,7 @@ const newCardForm = modalTypeNewCard.querySelector('.popup__form')
 newCardForm.addEventListener('submit', (evt) => {
   
   newCardFormSubmit(evt, renderCard, renderCardModal)
-  clearValidation(newCardForm,
-    {
-      formSelector: '.popup__form',
-      inputSelector: '.popup__input',
-      submitButtonSelector: '.popup__button',
-      inactiveButtonClass: 'popup__button_disabled',
-      inputErrorClass: 'popup__input_type_error',
-      errorClass: 'popup__error_visible'
-    }
-  )
+  clearValidation(newCardForm, formValidation)
 });
 
 const closeButton = document.querySelectorAll('.popup__close')
@@ -186,9 +177,7 @@ contents.forEach(closeByClickOnOverlay)
 
 
 Promise.all([getProfileInfoFromServer, getCardsFromServer])
-  .then((results) => {
-    const profileInfo = results[0];
-    const cards = results[1];
+  .then(([profileInfo, cards]) =>  {
 
     profileImage.style = `background-image: url(${profileInfo.avatar})`
     profileTitle.textContent = profileInfo.name
@@ -205,7 +194,10 @@ Promise.all([getProfileInfoFromServer, getCardsFromServer])
           {'renderCardModalFunc': renderCardModal}, 
           true)
     })
-  });
+    })
+    .catch((err) => {
+      console.log(err); 
+    });
   
 
 
@@ -236,21 +228,23 @@ function newAvatarFormSubmit(evt) {
   evt.preventDefault();
   renderLoading(newAvatarForm, true)
   editAvatarOnServer(avatarLinkInput.value)
+    .then((res) => {
+      profileImage.style = `background-image: url(${res.avatar})`
+    })
+    .catch((err) => {
+      console.log(err); 
+    })
     .finally(() => {
       renderLoading(newAvatarForm, false)
     })
-  profileImage.style = `background-image: url(${avatarLinkInput.value})`
+  
   closeModal(evt.target.closest('.popup'));
-  avatarLinkInput.value = '';
+  newAvatarForm.reset();
 }
 
 
 function renderLoading(form, isLoading) {
   const button = form.querySelector('.popup__button');
 
-  if (isLoading) {
-    button.textContent = 'Сохранение...'
-  } else {
-    button.textContent = 'Сохранить'
-  }
+  button.textContent = isLoading ? 'Сохранение...' : 'Сохранить'
 }

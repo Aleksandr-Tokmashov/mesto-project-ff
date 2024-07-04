@@ -53,8 +53,7 @@ function clearValidation(formElement, validationConfig) {
   inputList.forEach((inputElement) => {
     hideInputError(formElement, inputElement, validationConfig);
   })
-  buttonElement.disabled = true;
-  buttonElement.classList.add(validationConfig.inactiveButtonClass)
+  disableSubmitButton(buttonElement, validationConfig)
 };
 
 function hasInvalidInput(inputList) {
@@ -65,12 +64,20 @@ function hasInvalidInput(inputList) {
 
 function toggleButtonState(inputList, buttonElement, validationConfig) {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(validationConfig.inactiveButtonClass)
+    disableSubmitButton(buttonElement, validationConfig)
   } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(validationConfig.inactiveButtonClass)
+    enableSubmitButton(buttonElement, validationConfig)
   }
+}
+
+const disableSubmitButton = (button, config) => {
+  button.disabled = true;
+  button.classList.add(config.inactiveButtonClass)
+}
+
+const enableSubmitButton = (button, config) => {
+  button.disabled = false;
+  button.classList.remove(config.inactiveButtonClass)
 }
 
 export { enableValidation, clearValidation };

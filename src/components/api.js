@@ -1,165 +1,94 @@
-const getProfileInfoFromServer = 
-fetch('https://nomoreparties.co/v1/wff-cohort-17/users/me ', {
+const config = {
+  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-17',
   headers: {
-    authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49'
-    }
+    authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
+    'Content-Type': 'application/json'
+  }
+}
+
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
+}
+
+const getProfileInfoFromServer = 
+fetch(`${config.baseUrl}/users/me`, {
+  headers: config.headers
   })
-  
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  });
+  .then(handleResponse);
 
 
 const getCardsFromServer = 
-fetch('https://nomoreparties.co/v1/wff-cohort-17/cards', {
-  headers: {
-    authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49'
-    }
+fetch(`${config.baseUrl}/cards`, {
+  headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
 
 
 const addCardOnServer = (card) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-17/cards', {
+  return fetch(`${config.baseUrl}/cards`, {
     method: 'POST',
     body: JSON.stringify({
       name: card.name,
       link: card.link
     }),
-    headers: {'Content-Type': 'application/json',
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49'
-    }
+    headers: config.headers
     
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
 }; 
 
 
 const editProfileOnServer = (profileInfo) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-17/users/me', {
+  return fetch(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
-    headers: {
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
     body: JSON.stringify({
       name: profileInfo.name,
       about: profileInfo.about
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
 }
 
 
 const deleteCardOnServer = (cardId) => {
-  fetch(`https://nomoreparties.co/v1/wff-cohort-17/cards/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
-    headers: {
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
 }
 
 const likeCardOnServer = (cardId) => {
-  return fetch(`https://nomoreparties.co/v1/wff-cohort-17/cards/likes/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'PUT',
-    headers: {
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
   }
 
 
 const removeLikeFromCardOnServer = (cardId) => {
-  return fetch(`https://nomoreparties.co/v1/wff-cohort-17/cards/likes/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'DELETE',
-    headers: {
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
   }
 
 
 const editAvatarOnServer = (url) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-17/users/me/avatar', {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
-    headers: {
-      authorization: 'ebda8151-d672-43e0-ab30-c2b206b24b49',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
     body: JSON.stringify({
       avatar: url
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err); 
-  }); 
+  .then(handleResponse); 
 }
 
 export {getProfileInfoFromServer, getCardsFromServer, addCardOnServer,

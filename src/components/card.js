@@ -18,8 +18,7 @@ function createCard(cardData, callbacks) {
 
   if (cardData.profileInfo._id === cardData.cardInfo.owner._id ) {
     deleteButton.addEventListener('click', (evt) =>
-      {callbacks.deleteFunc(evt);
-       callbacks.deleteOnServerFunc(cardData.cardId)}
+      callbacks.deleteFunc(evt, callbacks, cardData)
       );}
   else {
     deleteButton.remove()
@@ -37,19 +36,27 @@ function createCard(cardData, callbacks) {
   }
 
   like.addEventListener('click', evt => {
-    callbacks.likeFunc(evt);
+  
     if (evt.target.classList.contains('card__like-button_is-active')) {
-      callbacks.likeCardOnServerFunc(cardData.cardId)
-      .then(res => {
-        numberOfLikes.textContent = res.likes.length
-      })}
-    else {
       callbacks.removeLikeFromCardOnServerFunc(cardData.cardId)
-      .then(res => {
-        numberOfLikes.textContent = res.likes.length
-      })
+        .then(res => {
+          numberOfLikes.textContent = res.likes.length;
+          likeCard(evt);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      callbacks.likeCardOnServerFunc(cardData.cardId)
+        .then(res => {
+          numberOfLikes.textContent = res.likes.length;
+          likeCard(evt);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-})
+  });
 
   
 
@@ -60,10 +67,17 @@ function createCard(cardData, callbacks) {
 
 // @todo: Функция удаления карточки
 
-function deleteCard(evt) {
-  const eventTarget = evt.target;
-  const targetParent = eventTarget.closest('.places__item')
-  targetParent.remove()
+function deleteCard(evt, callbacks, cardData) {
+  callbacks.deleteOnServerFunc(cardData.cardId)
+    .then((res) =>{
+      const eventTarget = evt.target;
+      const targetParent = eventTarget.closest('.places__item')
+      targetParent.remove()
+    })
+    .catch((err) => {
+      console.log(err); 
+  })
+  
 }
 
 // лайк карточки
