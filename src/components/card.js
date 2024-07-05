@@ -37,25 +37,7 @@ function createCard(cardData, callbacks) {
 
   like.addEventListener('click', evt => {
   
-    if (evt.target.classList.contains('card__like-button_is-active')) {
-      callbacks.removeLikeFromCardOnServerFunc(cardData.cardId)
-        .then(res => {
-          numberOfLikes.textContent = res.likes.length;
-          likeCard(evt);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      callbacks.likeCardOnServerFunc(cardData.cardId)
-        .then(res => {
-          numberOfLikes.textContent = res.likes.length;
-          likeCard(evt);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    callbacks.likeCallback(evt, cardData.cardId, numberOfLikes)
   });
 
   
@@ -85,6 +67,7 @@ function deleteCard(evt, callbacks, cardData) {
 function likeCard(evt) {
   evt.target.classList.toggle('card__like-button_is-active')
 }
+
 
 
 export { createCard, deleteCard, likeCard };

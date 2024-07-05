@@ -53,13 +53,26 @@ const formValidation =
   }
 // функция вывода карточки на страницу
 
+const likeCallback = (evt, cardId, numberOfLikes) => {
+  const likeMethod = evt.target.classList.contains('card__like-button_is-active') ? removeLikeFromCardOnServer : likeCardOnServer;
+  likeMethod(cardId) 
+      .then(res => { 
+        numberOfLikes.textContent = res.likes.length; 
+        likeCard(evt); 
+      }) 
+      .catch((err) => { 
+        console.log(err); 
+      }); 
+}
+
+
 function renderCard(cardData, callbacks, start=true) {
   const card = createCard({'cardName': cardData.cardName, 'cardLink': cardData.cardLink, 
     'cardId': cardData.cardId, 'likes': cardData.likes, 'cardInfo':  cardData.cardInfo,
     'profileInfo': cardData.profileInfo},
     {'deleteFunc': deleteCard, 'likeFunc': likeCard, 'likeCardOnServerFunc': likeCardOnServer,
      'renderModalFunc': callbacks.renderCardModalFunc, 'deleteOnServerFunc': deleteCardOnServer,
-     'removeLikeFromCardOnServerFunc': removeLikeFromCardOnServer});
+     'removeLikeFromCardOnServerFunc': removeLikeFromCardOnServer, 'likeCallback': likeCallback});
     
   if (start) {
     placesList.append(card);
@@ -210,16 +223,7 @@ const newAvatarForm = modalTypeNewAvatar.querySelector('.popup__form')
 newAvatarForm.addEventListener('submit', (evt) => {
   
   newAvatarFormSubmit(evt)
-  clearValidation(newCardForm,
-    {
-      formSelector: '.popup__form',
-      inputSelector: '.popup__input',
-      submitButtonSelector: '.popup__button',
-      inactiveButtonClass: 'popup__button_disabled',
-      inputErrorClass: 'popup__input_type_error',
-      errorClass: 'popup__error_visible'
-    }
-  )
+  clearValidation(newCardForm, formValidation)
 });
 
 
